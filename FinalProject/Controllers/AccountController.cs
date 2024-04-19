@@ -1,0 +1,268 @@
+﻿using FinalProject.Data;
+using FinalProject.Enums;
+using FinalProject.ServiceModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using FinalProject.Model;
+using System.Net.Mail;
+using System.Net;
+
+namespace FinalProject.Controllers
+{
+    public class AccountController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        public AccountController(ApplicationDbContext context)
+        {
+            _context = context;
+
+        }
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginModel request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(request);
+            }
+            var user = await _context.Users.Include(c => c.UserRole).Where(c => c.Email == request.Email && c.UserStatusId == (int)UserStatusEnum.Active).FirstOrDefaultAsync();
+            if (user is null)
+            {
+                ModelState.AddModelError(" ", "Email or password is not correct");
+                return View(request);
+
+            }
+            var result = user.CheckPassword(request.Password);
+            if (!result)
+            {
+                ModelState.AddModelError(" ", "Email or password is not correct");
+                return View(request);
+
+            }
+            var claims = new List<Claim>
+    {
+        new Claim("Name", user.Name),
+        new Claim("Surname", user.Surname),
+        new Claim("Email", user.Email),
+        new Claim("Id", user.Id.ToString()),
+         new Claim("RoleId", user.UserRoleId.ToString()),
+         new Claim(ClaimTypes.Role, user.Name)
+
+    };
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult Register()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterModel request)
+        {
+
+            try
+            {
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                if (!ModelState.IsValid)
+                {
+                    return View(request);
+                }
+                var user = await _context.Users.Where(c => c.Email == request.Email).FirstOrDefaultAsync();
+                if (user is not null)
+                {
+                    ModelState.AddModelError("", "There is already user like this");
+                    return View(request);
+                }
+
+
+                user = new User(request.Name,
+                                request.Surname,
+                                request.Email);
+
+                user.IP = ip ?? "::00";
+                user.AddPassword(request.Password);
+                user.AddUserRole();
+
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Login", "Account");
+
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Internal", "Error");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ForgotPassword()
+        {
+            return View();
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            if (String.IsNullOrEmpty(email))
+            {
+                ModelState.AddModelError("", "Email is not correct");
+
+                return View("ForgotPassword", email);
+            }
+
+            var user = await _context.Users.Where(c => c.Email == email && c.UserStatusId == (int)UserStatusEnum.Active).FirstOrDefaultAsync();
+            if (user is null)
+            {
+                ModelState.AddModelError("", "There is not any user like that");
+                return View("ForgotPassword", email);
+
+            }
+
+            var otp = GenerateOTP();
+            HttpContext.Session.SetString("otp", otp);
+            HttpContext.Session.SetString("otp_userId", user.Id.ToString());
+
+            string fromEmail = "taceddin_guven@hotmail.com";
+            
+            string password = "Melek2012";
+            
+            string toEmail = user.Email;
+             
+            string smtpAddress = "smtp.office365.com";
+            
+            int portNumber = 587;
+
+             
+            SmtpClient client = new SmtpClient(smtpAddress, portNumber);
+             
+            client.Credentials = new NetworkCredential(fromEmail, password);
+            
+            client.EnableSsl = true;
+
+            
+            MailMessage mailMessage = new MailMessage(fromEmail, toEmail);
+            
+
+            mailMessage.Subject = "Şifrəni Yeniləmək üçün OTP";
+            
+            mailMessage.Body = otp;
+            
+
+            try
+            {
+                 
+                client.SendMailAsync(mailMessage);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return RedirectToAction("ApproveOtp", "Account");
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApproveOtp()
+        {
+            var oneTimePassword = HttpContext.Session.GetString("otp");
+            if (oneTimePassword is null)
+            {
+                RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveOtp(int otpFromEmail)
+        {
+            var oneTimePassword = HttpContext.Session.GetString("otp");
+            if (oneTimePassword is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (oneTimePassword != otpFromEmail.ToString())
+            {
+                ModelState.AddModelError("", "OTP is not correct");
+                return View("ApproveOtp", otpFromEmail);
+            }
+
+            HttpContext.Session.SetString("otp_approved", "true");
+
+            return RedirectToAction("NewPassword", "Account");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> NewPassword()
+        {
+            var otpApproved = HttpContext.Session.GetString("otp_approved");
+            if (otpApproved is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+           return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NewPassword(UpdatePasswordModel request)
+        {
+            var otpApproved = HttpContext.Session.GetString("otp_approved");
+            if (otpApproved is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(request);
+            }
+
+            var userId = HttpContext.Session.GetString("otp_userId");
+            var user = await _context.Users.Where(c => c.Id.ToString() == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                ModelState.AddModelError("", "There is not any user like that");
+                return View(request);
+            }
+
+            user.UpdatePassword(request.NewPassword);
+            await _context.SaveChangesAsync();
+
+
+            HttpContext.Session.Remove("otp");
+            HttpContext.Session.Remove("otp_userId");
+            HttpContext.Session.Remove("otp_approved");
+
+
+            return RedirectToAction("Index", "Home");
+
+        }
+
+        private string GenerateOTP()
+        {
+            Random random = new Random();
+            return random.Next(1000, 10000).ToString();
+        }
+
+    }
+}
+
