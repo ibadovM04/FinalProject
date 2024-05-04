@@ -1,14 +1,17 @@
 ﻿using FinalProject.Data;
-using FinalProject.Enums;
+using FinalProject.Models;
 using FinalProject.ServiceModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using FinalProject.Model;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using FinalProject.Enums;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.AspNetCore.Http;
+using FinalProject.Model;
 
 namespace FinalProject.Controllers
 {
@@ -20,10 +23,13 @@ namespace FinalProject.Controllers
             _context = context;
 
         }
+
         public IActionResult Login()
         {
             return View();
+
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel request)
@@ -141,34 +147,34 @@ namespace FinalProject.Controllers
             HttpContext.Session.SetString("otp_userId", user.Id.ToString());
 
             string fromEmail = "taceddin_guven@hotmail.com";
-            
+
             string password = "Melek2012";
-            
+
             string toEmail = user.Email;
-             
+
             string smtpAddress = "smtp.office365.com";
-            
+
             int portNumber = 587;
 
-             
+
             SmtpClient client = new SmtpClient(smtpAddress, portNumber);
-             
+
             client.Credentials = new NetworkCredential(fromEmail, password);
-            
+
             client.EnableSsl = true;
 
-            
+
             MailMessage mailMessage = new MailMessage(fromEmail, toEmail);
-            
+
 
             mailMessage.Subject = "Şifrəni Yeniləmək üçün OTP";
-            
+
             mailMessage.Body = otp;
-            
+
 
             try
             {
-                 
+                // Send the email
                 client.SendMailAsync(mailMessage);
 
             }
@@ -179,7 +185,21 @@ namespace FinalProject.Controllers
 
             return RedirectToAction("ApproveOtp", "Account");
 
+
         }
+
+        //[HttpPost]
+        //public IActionResult SignOut()
+        //{
+        //    // Delete the cookie
+        //    Response.Cookies.Delete("YourCookieName"); // Replace "YourCookieName" with your actual cookie name
+
+        //    // Redirect to the home page or any other page
+        //    return RedirectToAction("Index", "Home");
+        //}
+
+
+
         [HttpGet]
         public async Task<IActionResult> ApproveOtp()
         {
@@ -188,6 +208,7 @@ namespace FinalProject.Controllers
             {
                 RedirectToAction("Index", "Home");
             }
+
 
             return View();
         }
@@ -209,8 +230,11 @@ namespace FinalProject.Controllers
 
             HttpContext.Session.SetString("otp_approved", "true");
 
+
+
             return RedirectToAction("NewPassword", "Account");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> NewPassword()
@@ -220,8 +244,10 @@ namespace FinalProject.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-           return View();
+            return View();
+
         }
+
 
         [HttpPost]
         public async Task<IActionResult> NewPassword(UpdatePasswordModel request)
@@ -255,7 +281,13 @@ namespace FinalProject.Controllers
 
             return RedirectToAction("Index", "Home");
 
+
+
         }
+
+
+
+
 
         private string GenerateOTP()
         {
@@ -263,6 +295,15 @@ namespace FinalProject.Controllers
             return random.Next(1000, 10000).ToString();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> LogOut()
+        {
+            HttpContext.SignOutAsync();
+
+            // Redirect to the home page or any desired page after sign-out
+            return RedirectToAction("Index", "Home");
+
+        }
     }
 }
 

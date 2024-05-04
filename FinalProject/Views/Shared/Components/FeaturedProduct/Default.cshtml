@@ -1,4 +1,5 @@
 ﻿@model List<FeaturedProductDto>
+
 <div class="site-section block-3 site-blocks-2 bg-light">
     <div class="container">
         <div class="row justify-content-center">
@@ -7,11 +8,12 @@
             </div>
         </div>
         <div class="row">
-            @foreach(var featuredProduct in Model)
-               {
+            
             <div class="col-md-12">
-                <div class="nonloop-block-3 owl-carousel">   
-                    
+               
+                <div class="nonloop-block-3 owl-carousel">
+                    @foreach (var featuredProduct in Model)
+                    {
                           <div class="item">
                             <div class="block-4 text-center">
                                 <figure class="block-4-image">
@@ -23,10 +25,13 @@
                                     <p class="text-primary font-weight-bold">$@featuredProduct.Price</p>
                                 </div>
                             </div>
-                        </div>                                                          
+                        </div>   
+                        }
                 </div>
+                
             </div>
-            }
+            
         </div>
     </div>
 </div>
+

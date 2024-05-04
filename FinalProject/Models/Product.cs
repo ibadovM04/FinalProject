@@ -9,7 +9,7 @@ namespace FinalProject.Model
         public string Slug { get; set; }
         public string Barcode { get; set; }
         public int CategoryId { get; set; }
-        public byte GenderTypeId { get; set; }
+        public byte GendrTypeId { get; set; }
         public string Description { get; set; }
         public double SellAmount { get; set; }
         public double BuyAmount { get; set; }
@@ -19,7 +19,6 @@ namespace FinalProject.Model
         public int? ShowQuantity { get; set; }
         public bool HasShipping { get; set; }
         public int? Discount { get; set; }
-        public bool IsDiscount {  get; set; }
 
         public ProductVariant ProductVariant { get; set; }
         public Category Category { get; set; }

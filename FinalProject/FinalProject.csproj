@@ -19,4 +19,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\account\images\shop\category\" />
+    <Folder Include="wwwroot\account\images\slider\" />
+  </ItemGroup>
+
 </Project>

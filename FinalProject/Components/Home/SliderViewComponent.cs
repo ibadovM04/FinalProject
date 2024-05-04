@@ -17,13 +17,14 @@ namespace FinalProject.Components.Home
         {
             var sliders = _context.Sliders.Select(s => new SliderDto
             {
-                SliderId=s.Id,
+                SliderId = s.Id,
                 Title = s.Title,
                 BackroundImageUrl = _configuration["Folders:Sliders"] + s.BackgroundImageUrl,
                 Text = s.Slogan,
                 Link = s.Link,
 
             })
+
                 .OrderByDescending(s => s.SliderId).ToList();
             return View(sliders);
         }

@@ -15,6 +15,7 @@ namespace FinalProject.Model
         public string ProfilePicture { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] Salt { get; set; }
+       
 
 
         public byte UserRoleId { get; set; }
@@ -44,6 +45,8 @@ namespace FinalProject.Model
             Updated = DateTime.Now;
             UserStatusId = (byte)UserStatusEnum.Active;
         }
+
+        
 
         public void UpdatePassword(string newPassword)
         {

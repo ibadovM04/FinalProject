@@ -20,10 +20,16 @@ namespace FinalProject.Data
         public DbSet<ProductReview> ProductReviews { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }     
         public DbSet<FeaturedProduct> FeaturedProducts { get; set; }
-        public DbSet<DiscountProduct> DiscountProducts { get; set; }
+        public DbSet<BigSaleProduct> BigSaleProducts { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<UserAddres> UserAddres { get; set; }
         public DbSet<GendrType> GendrTypes { get; set; }
+        public DbSet<Support> Supports { get; set; }
+        public DbSet<HomeAbout> HomeAbouts { get; set; }
+        public DbSet<TeamAbout> TeamAbouts { get; set; }
+        public DbSet<Team> Teams { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -47,9 +53,83 @@ namespace FinalProject.Data
                 entity.Property(p => p.PasswordHash).IsRequired().HasMaxLength(32);
 
                 entity.Property(p => p.Salt).IsRequired();
+
                 entity.Property(p => p.UserRoleId).IsRequired().HasDefaultValue(false);
 
                 entity.Property(p => p.EmailConfirmed).IsRequired();
+
+            });
+            #endregion
+
+            #region TeamAbout
+            modelBuilder.Entity<TeamAbout>(entity =>
+            {
+               entity.Property(p => p.Title).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Description).IsRequired().HasMaxLength(100);           
+             
+                entity.Property(p => p.ImageUrl).IsRequired().HasMaxLength(32);
+
+
+
+
+            });
+            #endregion
+
+            #region Team
+            modelBuilder.Entity<Team>(entity =>
+            {
+                entity.Property(p => p.TeamMemberPosition).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.TeamMemberName).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.profileImageUrl).IsRequired().HasMaxLength(32);
+                entity.Property(p => p.TeamMemberDescription).IsRequired().HasMaxLength(100);
+
+
+
+
+            });
+            #endregion
+
+
+
+            #region Contact
+            modelBuilder.Entity<Contact>(entity =>
+            {
+                entity.Property(p => p.FirstName).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.LastName).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Email).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Subject).HasMaxLength(1000);
+
+                entity.Property(p => p.Message).IsRequired().HasMaxLength(15);
+
+                
+
+            });
+            #endregion
+
+            #region Support
+            modelBuilder.Entity<Support>(entity =>
+            {
+                entity.Property(p => p.Title).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Description).IsRequired().HasMaxLength(100);
+
+
+            });
+            #endregion
+
+            #region HomeAbout
+            modelBuilder.Entity<HomeAbout>(entity =>
+            {
+                entity.Property(p => p.Title).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Description).IsRequired().HasMaxLength(100);
+
 
             });
             #endregion
@@ -91,20 +171,25 @@ namespace FinalProject.Data
             });
             #endregion
 
-            #region Discount products
-            modelBuilder.Entity<DiscountProduct>(entity =>
-            {
-                entity.Property(p => p.Name).IsRequired().HasMaxLength(200);
+            #region BigSale products
 
-                entity.Property(p => p.Slug).IsRequired().HasMaxLength(500);
+            modelBuilder.Entity<BigSaleProduct>(entity =>
+            {
+                entity.Property(p => p.Title).IsRequired().HasMaxLength(200);
+
+                entity.Property(p => p.DiscountInfo).IsRequired().HasMaxLength(500);
 
                 entity.Property(p => p.ImageURL).IsRequired().HasMaxLength(1000);
 
-                entity.Property(p => p.Price).IsRequired();
+                entity.Property(p => p.Link).IsRequired();
+                entity.Property(p => p.Description).IsRequired().HasMaxLength(500);
 
-                entity.Property(p => p.ProductId).IsRequired();
+
+
             });
             #endregion
+
+            
 
             #region Slider
             modelBuilder.Entity<Slider>(entity =>
@@ -140,7 +225,7 @@ namespace FinalProject.Data
 
                 entity.Property(p => p.CategoryId).IsRequired();
 
-                entity.Property(p => p.GenderTypeId).IsRequired();
+                entity.Property(p => p.GendrTypeId).IsRequired();
 
                 entity.Property(p => p.Description).IsRequired().HasMaxLength(1000);
 
@@ -153,7 +238,7 @@ namespace FinalProject.Data
                 entity.Property(p => p.Quantity).IsRequired();
 
                 entity.Property(p => p.InStock).IsRequired();
-                entity.Property(p => p.IsDiscount).IsRequired();
+               
 
                 entity.Property(p => p.HasShipping).IsRequired();
             });
