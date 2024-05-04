@@ -19,7 +19,6 @@ namespace FinalProject.Components.Product
             var vm = await _productManager.GetFilteredProducts(request);
 
             return View(vm);
-
         }
     }
 }

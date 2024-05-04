@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinalProject.Components.Home
 {
-    public class SliderViewComponent:ViewComponent
+    public class SliderViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
@@ -23,9 +23,8 @@ namespace FinalProject.Components.Home
                 Text = s.Slogan,
                 Link = s.Link,
 
-            })
+            }).OrderByDescending(s => s.SliderId).ToList();
 
-                .OrderByDescending(s => s.SliderId).ToList();
             return View(sliders);
         }
     }

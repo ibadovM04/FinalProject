@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinalProject.Components.Home
 {
-    public class HomeSupportViewComponent:ViewComponent
+    public class HomeSupportViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
 
@@ -21,11 +21,11 @@ namespace FinalProject.Components.Home
             var supports = await _context
                                         .Supports
                                         .Select(c => new SupportDto
-                                        {                                          
-                                         Title = c.Title,
+                                        {
+                                            Title = c.Title,
 
-                                        Description = c.Description
-                                      })
+                                            Description = c.Description
+                                        })
                                         .ToListAsync();
 
             return View(supports);

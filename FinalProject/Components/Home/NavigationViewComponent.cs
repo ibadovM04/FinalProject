@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinalProject.Components.Home
 {
-    public class NavigationViewComponent:ViewComponent
+    public class NavigationViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
         public NavigationViewComponent(ApplicationDbContext context)

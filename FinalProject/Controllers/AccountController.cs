@@ -12,15 +12,21 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using FinalProject.Model;
+using FinalProject.Interfaces;
+using FinalProject.Services;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace FinalProject.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IUserManager _userManager;
+
         private readonly ApplicationDbContext _context;
-        public AccountController(ApplicationDbContext context)
+        public AccountController(ApplicationDbContext context, IUserManager userManager)
         {
             _context = context;
+            _userManager = userManager;
 
         }
 
@@ -34,41 +40,20 @@ namespace FinalProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel request)
         {
+            //TODO: model state check
             if (!ModelState.IsValid)
             {
                 return View(request);
             }
-            var user = await _context.Users.Include(c => c.UserRole).Where(c => c.Email == request.Email && c.UserStatusId == (int)UserStatusEnum.Active).FirstOrDefaultAsync();
-            if (user is null)
+            var (result, errorMessage) = await _userManager.Login(request);
+
+            if (!string.IsNullOrEmpty(errorMessage))
             {
-                ModelState.AddModelError(" ", "Email or password is not correct");
+                ModelState.AddModelError(string.Empty, errorMessage);
                 return View(request);
-
             }
-            var result = user.CheckPassword(request.Password);
-            if (!result)
-            {
-                ModelState.AddModelError(" ", "Email or password is not correct");
-                return View(request);
 
-            }
-            var claims = new List<Claim>
-    {
-        new Claim("Name", user.Name),
-        new Claim("Surname", user.Surname),
-        new Claim("Email", user.Email),
-        new Claim("Id", user.Id.ToString()),
-         new Claim("RoleId", user.UserRoleId.ToString()),
-         new Claim(ClaimTypes.Role, user.Name)
-
-    };
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
-
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index","Home");
         }
 
         public IActionResult Register()

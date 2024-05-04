@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace FinalProject.Components.Home
 {
-    public class BigSaleProductViewComponent:ViewComponent
+    public class BigSaleProductViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
 
@@ -23,8 +23,8 @@ namespace FinalProject.Components.Home
                                         .BigSaleProducts
                                         .Select(c => new BigSaleProductDto
                                         {
-                                           Link = c.Link,
-                                           Title = c.Title,
+                                            Link = c.Link,
+                                            Title = c.Title,
                                             ImageURL = _configuration["Folders:BigSaleProducts"] + c.ImageURL,
                                             DiscountInfo = c.DiscountInfo,
                                             Description = c.Description

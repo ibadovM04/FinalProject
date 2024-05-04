@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace FinalProject.Components.Home
 {
-    public class HomeCategoryViewComponent:ViewComponent
+    public class HomeCategoryViewComponent : ViewComponent
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
@@ -16,7 +16,8 @@ namespace FinalProject.Components.Home
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var categories = _context.Categories.Where(c => c.IsMainPage).Select(c=> new CategoryDto {
+            var categories = _context.Categories.Where(c => c.IsMainPage).Select(c => new CategoryDto
+            {
 
                 Slogan = c.Slogan,
                 CategoryId = c.Id,
@@ -27,7 +28,7 @@ namespace FinalProject.Components.Home
 
             return View(categories);
         }
-       
+
 
     }
 }

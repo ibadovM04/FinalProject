@@ -11,6 +11,7 @@ builder.Services.AddMemoryCache();
 
 
 builder.Services.AddTransient<IProductManager, ProductManager>();
+builder.Services.AddTransient<IUserManager, UserManager>();
 
 builder.Services.AddHttpContextAccessor();
 
