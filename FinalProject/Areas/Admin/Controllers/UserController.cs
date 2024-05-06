@@ -1,7 +1,9 @@
 ﻿using FinalProject.Areas.Admin.DTOs;
+using FinalProject.Areas.Admin.Models;
 using FinalProject.Areas.Admin.ViewModels;
 using FinalProject.Data;
 using FinalProject.Enums;
+using FinalProject.Helper;
 using FinalProject.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +45,64 @@ namespace FinalProject.Areas.Admin.Controllers
 
             return View(vm);
         }
+        [HttpGet]
+        public async Task<JsonResult> Filter([FromQuery] UserFilterModel request)
+        {
+            //TODO add validation
 
+            var query = _context.Users.Where(u =>
+                                            (String.IsNullOrEmpty(request.Name) || u.Name.ToLower().StartsWith(request.Name.ToLower())) &&
+                                            (String.IsNullOrEmpty(request.Surname) || u.Surname.ToLower().StartsWith(request.Surname.ToLower())) &&
+                                            (String.IsNullOrEmpty(request.Email) || u.Email.ToLower().StartsWith(request.Email.ToLower())));
+
+            var result = await SelectUsers(query, request.Page);
+            //TODO: deaktiv function
+
+            var vm = new UserListVm
+            {
+                CurrentPage = request.Page,
+                TotalPage = result.Item2,
+                Users = result.Item1
+            };
+
+            var html = await RenderPartialView.InvokeAsync("_UserListPartialView",
+                                                            ControllerContext,
+                                                            _viewEngine,
+                                                            ViewData,
+                                                            TempData,
+                                                            vm);
+
+            return Json(new
+            {
+                status = 200,
+                data = html
+            });
+        }
+        [HttpPost]
+        public async Task<JsonResult> ChangeStatus([FromBody] ChangeUserStatusModel request)
+        {
+            //TODO: validation
+
+            var user = await _context.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync();
+            if (user is null)
+            {
+                return Json(new
+                {
+                    status = 400,
+                    error = "Belə bir istifadəçi yoxdur."
+                });
+            }
+
+            user.UserStatusId = request.StatusId;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                status = 200
+            });
+
+        }
         private async Task<(List<UserDto>, int)> SelectUsers(IQueryable<User> query, int page)
         {
             var takeNumber = Convert.ToInt32(_configuration["List:AdminUsers"]);

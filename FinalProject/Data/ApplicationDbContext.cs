@@ -28,6 +28,8 @@ namespace FinalProject.Data
         public DbSet<GendrType> GendrTypes { get; set; }
         public DbSet<Support> Supports { get; set; }
         public DbSet<HomeAbout> HomeAbouts { get; set; }
+        public DbSet<HomeFag> HomeFags { get; set; }
+        public DbSet<FAG> Fags { get; set; }
         public DbSet<TeamAbout> TeamAbouts { get; set; }
         public DbSet<Team> Teams { get; set; }
 
@@ -118,6 +120,28 @@ namespace FinalProject.Data
                 entity.Property(p => p.Title).IsRequired().HasMaxLength(100);
 
                 entity.Property(p => p.Description).IsRequired().HasMaxLength(100);
+
+
+            });
+            #endregion
+
+            #region HomeFag
+            modelBuilder.Entity<HomeFag>(entity =>
+            {
+                entity.Property(p => p.Title).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Description).IsRequired().HasMaxLength(100);
+
+
+            });
+            #endregion
+
+            #region Fag
+            modelBuilder.Entity<FAG>(entity =>
+            {
+                entity.Property(p => p.QuestionsTitle).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.QuestionsDescription).IsRequired().HasMaxLength(100);
 
 
             });

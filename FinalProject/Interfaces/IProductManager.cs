@@ -6,5 +6,6 @@ namespace FinalProject.Interfaces
     public interface IProductManager
     {
         Task<ProductListVm> GetFilteredProducts(ProductListQueryModel request);
+
     }
 }

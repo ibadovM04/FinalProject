@@ -1,4 +1,5 @@
-﻿@model UserListVm
+﻿@using FinalProject.Enums
+@model UserListVm
 
 <div id="tableDropdown">
     <div class="widget-header">
@@ -46,5 +47,195 @@
     <script src="~/admin/plugins/sweetalerts/sweetalert2.min.js"></script>
     <script src="~/admin/plugins/sweetalerts/custom-sweetalert.js"></script>
     <script src="~/admin/assets/js/scrollspyNav.js"></script>
+    <script src="~/admin/assets/js/userFilter.js"></script>
+    <script>
 
+        document.addEventListener("DOMContentLoaded", function () {
+            FilterByPagination();
+
+            const nameFilter = document.getElementById("name");
+            const surnameFilter = document.getElementById("surname");
+            const emailFilter = document.getElementById("email");
+
+            nameFilter.addEventListener("keyup", function () {
+
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                        res = JSON.parse(res.responseText);
+
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
+                        }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            })
+
+            surnameFilter.addEventListener("keyup", function () {
+
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                        res = JSON.parse(res.responseText);
+
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
+                        }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            })
+
+            emailFilter.addEventListener("keyup", function () {
+
+                Filter((res) => {
+                    const result = JSON.parse(res.responseText);
+                    document.querySelector("#table-area").innerHTML = result.data;
+                    FilterByPagination();
+                    ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                        res = JSON.parse(res.responseText);
+
+                        if (res.status == 400) {
+                            swal({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: `${res.error}`
+                            });
+                            return;
+                        }
+                        else {
+
+                            if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                                userStatus.classList.remove("badge-danger")
+                                userStatus.classList.add("badge-success")
+                                userStatus.innerText = "Aktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                            }
+                            else {
+                                userStatus.classList.remove("badge-success")
+                                userStatus.classList.add("badge-danger")
+                                userStatus.innerText = "Deaktiv"
+                                userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                            }
+
+
+                            swal(
+                                'Uğurlu əməliyyat!',
+                                'Dəyişikliklər yadda saxlanıldı.',
+                                'success'
+                            );
+                            return;
+                        }
+                    })
+                });
+
+            });
+
+            ChangeUserStatus((res, userStatus, changeStatusId) => {
+
+                res = JSON.parse(res.responseText);
+
+                if (res.status == 400) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: `${res.error}`
+                    });
+                    return;
+                }
+                else {
+
+                    if (changeStatusId == @((byte)UserStatusEnum.Active)) {
+                        userStatus.classList.remove("badge-danger")
+                        userStatus.classList.add("badge-success")
+                        userStatus.innerText = "Aktiv"
+                        userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Deactive))
+                    }
+                    else {
+                        userStatus.classList.remove("badge-success")
+                        userStatus.classList.add("badge-danger")
+                        userStatus.innerText = "Deaktiv"
+                        userStatus.setAttribute("data-change-id", @((byte)UserStatusEnum.Active))
+                    }
+
+
+                    swal(
+                        'Uğurlu əməliyyat!',
+                        'Dəyişikliklər yadda saxlanıldı.',
+                        'success'
+                    );
+                    return;
+                }
+            })
+
+
+        })
+
+
+
+    </script>
 }

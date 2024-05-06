@@ -18,7 +18,7 @@
         }
     }
 
-    xhr.open("GET", "https://localhost:7274/Admin/User/Filter?name=" + nameValue + "&surname=" + surnameValue + "&email" + emailValue + "&page=" + clickedPage, true);
+    xhr.open("GET", "https://localhost:7241/Admin/User/Filter?name=" + nameValue + "&surname=" + surnameValue + "&email" + emailValue + "&page=" + clickedPage, true);
 
     xhr.send();
 }
@@ -95,7 +95,7 @@ function ChangeUserStatus(callback) {
                     }
 
 
-                    xhr.open("POST", "https://localhost:7024/Admin/User/ChangeStatus", true);
+                    xhr.open("POST", "https://localhost:7241/Admin/User/ChangeStatus", true);
 
                     xhr.setRequestHeader("content-type", "application/json");
 
